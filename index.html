@@ -1198,17 +1198,17 @@
 
       <div class="form-group">
         <label>Tu nombre</label>
-        <input type="text" id="f-nombre" placeholder="" />
+        <input type="text" id="f-nombre" placeholder="" required />
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Fecha deseada</label>
-          <input type="date" id="f-fecha" />
+          <input type="date" id="f-fecha" required />
         </div>
         <div class="form-group">
           <label>Hora preferida</label>
-          <select id="f-hora">
+          <select id="f-hora" required>
             <option value="">Seleccionar hora...</option>
           </select>
         </div>
@@ -1216,7 +1216,7 @@
 
       <div class="form-group">
         <label>Servicio</label>
-        <select id="f-servicio">
+        <select id="f-servicio" required>
           <option value="">Seleccionar servicio…</option>
           <option>Corte de Niños – RD$300</option>
           <option>Corte de Adultos – RD$350</option>
@@ -1514,6 +1514,20 @@
     async function generarWA(e) {
       e.preventDefault();
 
+      const camposRequeridos = [
+        document.getElementById('f-nombre'),
+        document.getElementById('f-fecha'),
+        document.getElementById('f-hora'),
+        document.getElementById('f-servicio')
+      ];
+
+      const primerInvalido = camposRequeridos.find((campo) => !campo.checkValidity());
+      if (primerInvalido) {
+        primerInvalido.reportValidity();
+        primerInvalido.focus();
+        return;
+      }
+
       const confirmoEnvio = await mostrarAvisoCita();
       if (!confirmoEnvio) {
         return;
@@ -1549,7 +1563,7 @@
       const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
 
-      document.getElementById('f-fecha').value = '';
+      document.getElementById('f-fecha').value = today;
       document.getElementById('f-hora').value = '';
       document.getElementById('f-nota').value = '';
     }
@@ -1570,6 +1584,7 @@
     // ── FECHA MÍNIMA HOY ──
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('f-fecha').setAttribute('min', today);
+    document.getElementById('f-fecha').value = today;
 
     function pad2(value) {
       return String(value).padStart(2, '0');
