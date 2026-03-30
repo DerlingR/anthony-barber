@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#111108" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <title>Anthony Barber — Barbería de Hombres</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #F5F0E8;
+      --dark: #111108;
+      --gold: #C9A84C;
+      --gold-light: #E2C97E;
+      --charcoal: #2A2A25;
+      --mid: #5A5A50;
+      --red: #8B1A1A;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: .35;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(17,17,8,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,168,76,.15);
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--cream); }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+      opacity: .7;
+      transition: opacity .25s, color .25s;
+    }
+
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+    .nav-cta {
+      background: var(--gold);
+      color: var(--dark) !important;
+      opacity: 1 !important;
+      padding: .55rem 1.4rem;
+      border-radius: 2px;
+    }
+    .nav-cta:hover { background: var(--gold-light); color: var(--dark) !important; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10rem 4rem 6rem 5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .8rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp .8s .3s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.0;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp .8s .5s forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(245,240,232,.6);
+      max-width: 400px;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp .8s .7s forwards;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .8s .9s forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      background: var(--gold);
+      color: var(--dark);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .9rem 2rem;
+      border-radius: 2px;
+      transition: background .25s, transform .2s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      border: 1px solid rgba(201,168,76,.4);
+      color: var(--cream);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .9rem 2rem;
+      border-radius: 2px;
+      transition: border-color .25s, background .25s, transform .2s;
+    }
+    .btn-secondary:hover { border-color: var(--gold); background: rgba(201,168,76,.08); transform: translateY(-2px); }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-img-placeholder {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1a1a14 0%, #2a2016 50%, #1a1208 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .hero-main-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+    }
+
+    .hero-img-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 30px,
+        rgba(201,168,76,.03) 30px,
+        rgba(201,168,76,.03) 31px
+      );
+    }
+
+    .scissors-icon {
+      font-size: 4rem;
+      opacity: .25;
+    }
+
+    .placeholder-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: .4;
+    }
+
+    .hero-right::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, var(--dark) 0%, transparent 30%);
+      z-index: 1;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(201,168,76,.15);
+      opacity: 0;
+      animation: fadeUp .8s 1.1s forwards;
+    }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .75rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,.45);
+      margin-top: .3rem;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(201,168,76,.3), transparent);
+    }
+
+    /* ── SERVICIOS ── */
+    .services {
+      padding: 7rem 5rem;
+      position: relative;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 4rem;
+    }
+
+    .section-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .75rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5px;
+      background: rgba(201,168,76,.1);
+    }
+
+    .service-card {
+      background: var(--dark);
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: background .3s;
+    }
+
+    .service-card:hover { background: #161610; }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--gold);
+      transition: width .4s ease;
+    }
+    .service-card:hover::before { width: 100%; }
+
+    .service-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: rgba(201,168,76,.08);
+      line-height: 1;
+      margin-bottom: .5rem;
+      transition: color .3s;
+    }
+    .service-card:hover .service-num { color: rgba(201,168,76,.15); }
+
+    .service-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+    }
+
+    .service-desc {
+      font-size: .875rem;
+      color: rgba(245,240,232,.5);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .service-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* ── GALERÍA ── */
+    .gallery {
+      padding: 7rem 5rem;
+      background: #0d0d0a;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 300px);
+      gap: 8px;
+      margin-top: 3rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      background: var(--charcoal);
+      cursor: pointer;
+    }
+
+    .gallery-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transform: scale(1);
+      transition: transform .35s ease;
+    }
+
+    .gallery-item:hover .gallery-photo {
+      transform: scale(1.03);
+    }
+
+    .gallery-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .75rem;
+      background: linear-gradient(135deg, #1e1e16, #252518);
+      border: 1px dashed rgba(201,168,76,.2);
+      transition: border-color .3s, background .3s;
+    }
+
+    .gallery-item:hover .gallery-placeholder {
+      border-color: rgba(201,168,76,.5);
+      background: linear-gradient(135deg, #222219, #2a2a1c);
+    }
+
+    .gallery-icon {
+      font-size: 2.2rem;
+      opacity: .25;
+      transition: opacity .3s, transform .3s;
+    }
+    .gallery-item:hover .gallery-icon { opacity: .45; transform: scale(1.1); }
+
+    .gallery-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .7rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: .45;
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(11,11,8,.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+    .gallery-overlay-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .8rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ── CITA ── */
+    .booking {
+      padding: 8rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .booking::before {
+      content: '';
+      position: absolute;
+      top: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(201,168,76,.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .booking-left .section-title { margin-bottom: 1.5rem; }
+
+    .booking-desc {
+      font-size: .95rem;
+      line-height: 1.9;
+      color: rgba(245,240,232,.55);
+      margin-bottom: 2.5rem;
+    }
+
+    .booking-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .9rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .booking-features li {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: .9rem;
+      color: rgba(245,240,232,.7);
+    }
+
+    .booking-features li::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .booking-card {
+      background: #141410;
+      border: 1px solid rgba(201,168,76,.15);
+      border-radius: 4px;
+      padding: 3rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .booking-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+    }
+
+    .booking-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    .booking-card-sub {
+      font-size: .85rem;
+      color: rgba(245,240,232,.45);
+      margin-bottom: 2rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: .1em;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,.5);
+      margin-bottom: .5rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(201,168,76,.15);
+      border-radius: 2px;
+      padding: .8rem 1rem;
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      font-size: .9rem;
+      transition: border-color .25s;
+      outline: none;
+      appearance: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: rgba(201,168,76,.5);
+    }
+
+    .form-group select option { background: #1a1a14; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .wa-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .75rem;
+      background: #25D366;
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 1rem;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-top: 1.2rem;
+      text-decoration: none;
+      transition: background .25s, transform .2s;
+    }
+    .wa-btn:hover { background: #1ebe5d; transform: translateY(-2px); }
+
+    .wa-icon {
+      width: 22px; height: 22px;
+      fill: currentColor;
+    }
+
+    .booking-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,5,4,.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+      z-index: 300;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .2s ease, visibility .2s ease;
+    }
+
+    .booking-modal.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .booking-modal-card {
+      width: min(520px, 100%);
+      background: #13130f;
+      border: 1px solid rgba(201,168,76,.28);
+      border-radius: 8px;
+      box-shadow: 0 22px 48px rgba(0,0,0,.45);
+      padding: 1.6rem;
+      position: relative;
+    }
+
+    .booking-modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold-light);
+      margin-bottom: .8rem;
+    }
+
+    .booking-modal-desc {
+      font-size: .94rem;
+      line-height: 1.75;
+      color: rgba(245,240,232,.78);
+      margin-bottom: 1.4rem;
+    }
+
+    .booking-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: .7rem;
+      flex-wrap: wrap;
+    }
+
+    .modal-btn {
+      border: 1px solid rgba(201,168,76,.4);
+      background: transparent;
+      color: var(--cream);
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: .78rem;
+      font-weight: 700;
+      padding: .65rem 1rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    }
+
+    .modal-btn:hover {
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .modal-btn.primary {
+      background: var(--gold);
+      color: var(--dark);
+      border-color: var(--gold);
+    }
+
+    .modal-btn.primary:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-light);
+    }
+
+    .ig-float {
+      position: fixed;
+      right: 1.1rem;
+      bottom: 1.1rem;
+      z-index: 120;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      padding: .75rem 1rem;
+      background: linear-gradient(135deg, #f58529, #dd2a7b 45%, #8134af 75%, #515bd4);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 999px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .78rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      box-shadow: 0 8px 22px rgba(0,0,0,.35);
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .ig-float:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .ig-float svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .ig-icon {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ── UBICACIÓN ── */
+    .location {
+      padding: 7rem 5rem;
+      background: linear-gradient(160deg, #10100c 0%, #17140f 60%, #1e1710 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .location::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 15% 20%, rgba(201,168,76,.12), transparent 40%);
+      pointer-events: none;
+    }
+
+    .location-card {
+      max-width: 860px;
+      margin: 0 auto;
+      background: rgba(10,10,7,.72);
+      border: 1px solid rgba(201,168,76,.2);
+      border-radius: 8px;
+      padding: 2.2rem;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(8px);
+    }
+
+    .location-address {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+      line-height: 1.4;
+      color: var(--cream);
+      margin-bottom: 1.4rem;
+    }
+
+    .location-note {
+      color: rgba(245,240,232,.55);
+      font-size: .9rem;
+      line-height: 1.7;
+      margin-bottom: 1.7rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0a0a07;
+      border-top: 1px solid rgba(201,168,76,.1);
+      padding: 4rem 5rem 2.5rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand .nav-logo {
+      display: block;
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .footer-brand p {
+      font-size: .875rem;
+      line-height: 1.8;
+      color: rgba(245,240,232,.4);
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+    }
+
+    .footer-col ul { list-style: none; }
+
+    .footer-col ul li {
+      font-size: .875rem;
+      color: rgba(245,240,232,.45);
+      margin-bottom: .6rem;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(201,168,76,.08);
+      padding-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-bottom p {
+      font-size: .8rem;
+      color: rgba(245,240,232,.25);
+    }
+
+    .footer-bottom span {
+      color: var(--gold);
+      opacity: .6;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+      .hero-left { padding: 8rem 1.5rem 4rem; }
+      .hero-right { height: 280px; }
+
+      .services { padding: 5rem 1.5rem; }
+      .services-grid { grid-template-columns: 1fr; }
+
+      .gallery { padding: 5rem 1.5rem; }
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(3, 200px);
+      }
+      .gallery-item:nth-child(1),
+      .gallery-item:nth-child(5) { grid-column: auto; grid-row: auto; }
+
+      .booking {
+        grid-template-columns: 1fr;
+        padding: 5rem 1.5rem;
+        gap: 3rem;
+      }
+
+      .location { padding: 5rem 1.5rem; }
+      .location-card { padding: 1.5rem; }
+
+      .ig-float {
+        right: .8rem;
+        bottom: .8rem;
+        padding: .7rem .9rem;
+        letter-spacing: .1em;
+      }
+
+      .booking-modal-card { padding: 1.2rem; }
+      .booking-modal-actions { width: 100%; }
+      .modal-btn { width: 100%; }
+
+      footer { padding: 3rem 1.5rem 2rem; }
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Anthony <span>Barber</span></a>
+    <ul class="nav-links">
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#galeria">Galería</a></li>
+      <li><a href="#ubicacion">Ubicación</a></li>
+      <li><a href="#cita">Nosotros</a></li>
+      <li><a href="#cita" class="nav-cta">Agendar Cita</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-tag">✦ Barbería de Caballeros</p>
+      <h1 class="hero-title">El arte del<br>corte <em>perfecto.</em></h1>
+      <p class="hero-desc">
+        En Anthony Barber, cada corte es una obra de precisión. Fusionamos técnica clásica con estilo contemporáneo para que luzcas impecable en cada ocasión.
+      </p>
+      <div class="hero-btns">
+        <a href="#cita" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Agendar Cita
+        </a>
+        <a href="#galeria" class="btn-secondary">Ver Galería</a>
+        <a href="https://www.instagram.com/anthony_villegas_barber?igsh=MTNneDdycDE3MnV2Mw==" class="btn-secondary" target="_blank" rel="noopener noreferrer">
+          <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2m0-2A7.76 7.76 0 0 0 0 7.75v8.5A7.76 7.76 0 0 0 7.75 24h8.5A7.76 7.76 0 0 0 24 16.25v-8.5A7.76 7.76 0 0 0 16.25 0h-8.5z"/>
+            <path d="M12 6.84A5.16 5.16 0 1 1 6.84 12 5.16 5.16 0 0 1 12 6.84m0-2A7.16 7.16 0 1 0 19.16 12 7.16 7.16 0 0 0 12 4.84z"/>
+            <circle cx="18.2" cy="5.8" r="1.2"/>
+          </svg>
+          Instagram
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">8+</div>
+          <div class="stat-label">Años de experiencia</div>
+        </div>
+        <div>
+          <div class="stat-num">100+</div>
+          <div class="stat-label">Clientes satisfechos</div>
+        </div>
+        <div>
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Estilo garantizado</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-img-placeholder">
+        <img src="img/local.png" alt="Foto principal del local Anthony Barber" class="hero-main-image" />
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- SERVICIOS -->
+  <section class="services" id="servicios">
+    <div class="section-header">
+      <div>
+        <p class="section-tag">✦ Lo que ofrecemos</p>
+        <h2 class="section-title">Nuestros<br>Servicios</h2>
+      </div>
+      <a href="#cita" class="btn-secondary">Reservar Cita</a>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <h3 class="service-name">Corte de Niños</h3>
+        <p class="service-desc">Corte infantil con acabado limpio, cómodo y adaptado al estilo de cada niño.</p>
+        <div class="service-price">RD$300</div>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <h3 class="service-name">Corte de Adultos</h3>
+        <p class="service-desc">Corte para adultos con terminación profesional, líneas limpias y estilo moderno.</p>
+        <div class="service-price">RD$350</div>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <h3 class="service-name">Corte de Adultos con Barba</h3>
+        <p class="service-desc">Incluye corte de adulto y perfilado de barba para un look completo y definido.</p>
+        <div class="service-price">RD$400</div>
+      </div>
+      <div class="service-card">
+        <div class="service-num">04</div>
+        <h3 class="service-name">Cejas</h3>
+        <p class="service-desc">Limpieza y definición de cejas para mantener una expresión más ordenada y estética.</p>
+        <div class="service-price">RD$75</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- GALERÍA -->
+  <section class="gallery" id="galeria">
+    <div class="section-header">
+      <div>
+        <p class="section-tag">✦ Nuestro trabajo</p>
+        <h2 class="section-title">Galería de<br>Cortes</h2>
+      </div>
+    </div>
+
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="img/corte1.png" alt="Corte de cabello 1" class="gallery-photo" />
+        <div class="gallery-overlay">
+          <span class="gallery-overlay-text">Corte 1</span>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="img/corte2.png" alt="Corte de cabello 2" class="gallery-photo" />
+        <div class="gallery-overlay">
+          <span class="gallery-overlay-text">Corte 2</span>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="img/corte3.png" alt="Corte de cabello 3" class="gallery-photo" />
+        <div class="gallery-overlay">
+          <span class="gallery-overlay-text">Corte 3</span>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="img/corte4.png" alt="Corte de cabello 4" class="gallery-photo" />
+        <div class="gallery-overlay">
+          <span class="gallery-overlay-text">Corte 4</span>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center; margin-top:2rem; font-size:.8rem; color:rgba(245,240,232,.3); font-family:'Barlow Condensed',sans-serif; letter-spacing:.2em; text-transform:uppercase;">
+      Fotos cargadas desde la carpeta img
+    </p>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- CITA -->
+  <section class="booking" id="cita">
+    <div class="booking-left">
+      <p class="section-tag">✦ Reserva tu espacio</p>
+      <h2 class="section-title">Agenda tu<br>Cita <em style="font-family:'Playfair Display',serif; font-style:italic; color:var(--gold);">hoy.</em></h2>
+      <p class="booking-desc">
+        Reserva tu cita directamente por WhatsApp. Rápido, fácil y sin complicaciones. Nuestro equipo confirma en minutos.
+      </p>
+      <ul class="booking-features">
+        <li>Confirmación inmediata por WhatsApp</li>
+        <li>Elige tu barbero preferido</li>
+        <li>Horarios flexibles de lunes a domingo</li>
+        <li>Sin cargos por cancelación con 2h de aviso</li>
+      </ul>
+      <div style="display:flex; gap:2rem; flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:.25em; text-transform:uppercase; color:var(--gold); margin-bottom:.4rem;">Horario</div>
+          <div style="font-size:.9rem; color:rgba(245,240,232,.6);">Lunes a viernes: 10:00 a. m. – 8:00 p. m.</div>
+          <div style="font-size:.9rem; color:rgba(245,240,232,.6);">Sábados y domingos: 8:00 a. m. – 8:00 p. m.</div>
+        </div>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:.25em; text-transform:uppercase; color:var(--gold); margin-bottom:.4rem;">Ubicación</div>
+          <div style="font-size:.9rem; color:rgba(245,240,232,.6);">Calle 8 Urb. El Paso, Villa Mella</div>
+          <div style="font-size:.9rem; color:rgba(245,240,232,.6);">Santo Domingo Norte, República Dominicana</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="booking-card">
+      <h3 class="booking-card-title">Reservar Cita</h3>
+      <p class="booking-card-sub">Completa el formulario · Te contactamos por WhatsApp</p>
+
+      <div class="form-group">
+        <label>Tu nombre</label>
+        <input type="text" id="f-nombre" placeholder="Ej. Carlos Rodríguez" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha deseada</label>
+          <input type="date" id="f-fecha" />
+        </div>
+        <div class="form-group">
+          <label>Hora preferida</label>
+          <input type="time" id="f-hora" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Horario (AM/PM)</label>
+        <select id="f-periodo">
+          <option value="">Seleccionar horario…</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Servicio</label>
+        <select id="f-servicio">
+          <option value="">Seleccionar servicio…</option>
+          <option>Corte de Niños – RD$300</option>
+          <option>Corte de Adultos – RD$350</option>
+          <option>Corte de Adultos con Barba – RD$400</option>
+          <option>Cejas – RD$75</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Nota adicional (opcional)</label>
+        <textarea id="f-nota" placeholder="Cuéntanos qué tienes en mente…"></textarea>
+      </div>
+
+      <a id="wa-link" href="#" class="wa-btn" onclick="generarWA(event)">
+        <svg class="wa-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Enviar por WhatsApp
+      </a>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- UBICACIÓN -->
+  <section class="location" id="ubicacion">
+    <div class="location-card">
+      <p class="section-tag">✦ Cómo llegar</p>
+      <h2 class="section-title" style="margin-bottom:1rem;">Visítanos en<br>Villa Mella</h2>
+      <p class="location-address">Calle 8 Urb. El Paso, Villa Mella</p>
+      <p class="location-note">Botón listo para usar tu enlace de Google Maps cuando me compartas la ruta exacta.</p>
+      <a id="map-link" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">Ir a ubicación</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo">Anthony <span>Barber</span></a>
+        <p>Precisión, estilo y carácter. Tu barbería de confianza en República Dominicana.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li>Corte de Niños</li>
+          <li>Corte de Adultos</li>
+          <li>Corte de Adultos con Barba</li>
+          <li>Cejas</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Horario</h4>
+        <ul>
+          <li>Lunes a viernes: 10:00 a. m. – 8:00 p. m.</li>
+          <li>Sábados y domingos: 8:00 a. m. – 8:00 p. m.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Anthony Barber. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <a
+    class="ig-float"
+    href="https://www.instagram.com/anthony_villegas_barber?igsh=MTNneDdycDE3MnV2Mw=="
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Abrir Instagram"
+  >
+    <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2m0-2A7.76 7.76 0 0 0 0 7.75v8.5A7.76 7.76 0 0 0 7.75 24h8.5A7.76 7.76 0 0 0 24 16.25v-8.5A7.76 7.76 0 0 0 16.25 0h-8.5z"/>
+      <path d="M12 6.84A5.16 5.16 0 1 1 6.84 12 5.16 5.16 0 0 1 12 6.84m0-2A7.16 7.16 0 1 0 19.16 12 7.16 7.16 0 0 0 12 4.84z"/>
+      <circle cx="18.2" cy="5.8" r="1.2"/>
+    </svg>
+    Instagram
+  </a>
+
+  <div class="booking-modal" id="booking-modal" aria-hidden="true">
+    <div class="booking-modal-card" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title" aria-describedby="booking-modal-desc">
+      <h3 class="booking-modal-title" id="booking-modal-title">Aviso Importante</h3>
+      <p class="booking-modal-desc" id="booking-modal-desc">Este mensaje no confirma tu cita. Recibiras la confirmacion a traves de WhatsApp.</p>
+      <div class="booking-modal-actions">
+        <button type="button" class="modal-btn" id="booking-cancel">Cancelar</button>
+        <button type="button" class="modal-btn primary" id="booking-continue">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WA_NUMBER = '18096404201';
+    const MAPS_URL = 'https://maps.app.goo.gl/JFKfaUWm8pkt6Fu27';
+    const bookingModal = document.getElementById('booking-modal');
+    const bookingContinueBtn = document.getElementById('booking-continue');
+    const bookingCancelBtn = document.getElementById('booking-cancel');
+
+    function mostrarAvisoCita() {
+      return new Promise((resolve) => {
+        let resolved = false;
+
+        const cleanup = () => {
+          bookingModal.classList.remove('is-open');
+          bookingModal.setAttribute('aria-hidden', 'true');
+          bookingContinueBtn.removeEventListener('click', onContinue);
+          bookingCancelBtn.removeEventListener('click', onCancel);
+          bookingModal.removeEventListener('click', onBackdrop);
+          document.removeEventListener('keydown', onKeyDown);
+        };
+
+        const finish = (result) => {
+          if (resolved) return;
+          resolved = true;
+          cleanup();
+          resolve(result);
+        };
+
+        const onContinue = () => finish(true);
+        const onCancel = () => finish(false);
+        const onBackdrop = (event) => {
+          if (event.target === bookingModal) finish(false);
+        };
+        const onKeyDown = (event) => {
+          if (event.key === 'Escape') finish(false);
+        };
+
+        bookingModal.classList.add('is-open');
+        bookingModal.setAttribute('aria-hidden', 'false');
+        bookingContinueBtn.focus();
+
+        bookingContinueBtn.addEventListener('click', onContinue);
+        bookingCancelBtn.addEventListener('click', onCancel);
+        bookingModal.addEventListener('click', onBackdrop);
+        document.addEventListener('keydown', onKeyDown);
+      });
+    }
+
+    async function generarWA(e) {
+      e.preventDefault();
+
+      const confirmoEnvio = await mostrarAvisoCita();
+      if (!confirmoEnvio) {
+        return;
+      }
+
+      const nombre   = document.getElementById('f-nombre').value.trim() || 'Sin nombre';
+      const fecha    = document.getElementById('f-fecha').value || 'Por definir';
+      const hora     = document.getElementById('f-hora').value || 'Por definir';
+      const periodo  = document.getElementById('f-periodo').value;
+      const servicio = document.getElementById('f-servicio').value || 'Por definir';
+      const nota     = document.getElementById('f-nota').value.trim();
+      const horaCompleta = hora === 'Por definir' ? hora : `${hora} ${periodo}`.trim();
+
+      let msg = `*Nueva Solicitud de Cita - Anthony Barber*\n\n`;
+      msg += `*Nombre:* ${nombre}\n`;
+      msg += `*Fecha:* ${fecha}\n`;
+      msg += `*Hora:* ${horaCompleta}\n`;
+      msg += `*Servicio:* ${servicio}\n`;
+      if (nota) msg += `*Nota:* ${nota}\n`;
+      msg += `\nConfirma mi cita, por favor.`;
+
+      const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+
+      document.getElementById('f-nombre').value = '';
+      document.getElementById('f-fecha').value = '';
+      document.getElementById('f-hora').value = '';
+      document.getElementById('f-periodo').value = '';
+      document.getElementById('f-servicio').value = '';
+      document.getElementById('f-nota').value = '';
+    }
+
+    // ── ANIMACIÓN DE ENTRADA AL SCROLL ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.service-card, .gallery-item, .booking-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity .6s ease, transform .6s ease';
+      observer.observe(el);
+    });
+
+    // ── FECHA MÍNIMA HOY ──
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('f-fecha').setAttribute('min', today);
+
+    document.getElementById('map-link').setAttribute('href', MAPS_URL);
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('./sw.js')
+          .then((registration) => {
+            let refreshing = false;
+
+            if (registration.waiting) {
+              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (!newWorker) return;
+
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              if (refreshing) return;
+              refreshing = true;
+              window.location.reload();
+            });
+          })
+          .catch((error) => {
+            console.error('Error registrando Service Worker:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
