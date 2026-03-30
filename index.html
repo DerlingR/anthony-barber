@@ -679,6 +679,19 @@
       flex-wrap: wrap;
     }
 
+    .ios-install-steps {
+      margin: 0 0 1.2rem;
+      padding-left: 1.1rem;
+      color: rgba(245,240,232,.86);
+      font-size: .9rem;
+      line-height: 1.8;
+    }
+
+    .ios-install-steps li::marker {
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
     .modal-btn {
       border: 1px solid rgba(201,168,76,.4);
       background: transparent;
@@ -1294,6 +1307,22 @@
     </div>
   </div>
 
+  <div class="booking-modal" id="ios-install-modal" aria-hidden="true">
+    <div class="booking-modal-card" role="dialog" aria-modal="true" aria-labelledby="ios-install-title" aria-describedby="ios-install-desc">
+      <h3 class="booking-modal-title" id="ios-install-title">Instalar en iPhone</h3>
+      <p class="booking-modal-desc" id="ios-install-desc">Para agregar Anthony Barber a tu pantalla de inicio, sigue estos pasos:</p>
+      <ol class="ios-install-steps">
+        <li>Presiona los 3 puntos.</li>
+        <li>Toca Compartir.</li>
+        <li>Selecciona Ver mas.</li>
+        <li>Elige Agregar a Inicio.</li>
+      </ol>
+      <div class="booking-modal-actions">
+        <button type="button" class="modal-btn primary" id="ios-install-close">Entendido</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const WA_NUMBER = '18096404201';
     const MAPS_URL = 'https://maps.app.goo.gl/JFKfaUWm8pkt6Fu27';
@@ -1302,6 +1331,9 @@
     const bookingCancelBtn = document.getElementById('booking-cancel');
     const backToTopBtn = document.getElementById('back-to-top');
     const installAppBtn = document.getElementById('install-app-btn');
+    const iosInstallModal = document.getElementById('ios-install-modal');
+    const iosInstallCloseBtn = document.getElementById('ios-install-close');
+    const IOS_INSTALL_HINT_SEEN_KEY = 'ab_ios_install_hint_seen_v1';
     let deferredInstallPrompt = null;
 
     function iniciarAnimacionesScroll() {
@@ -1346,11 +1378,57 @@
 
     function actualizarUIInstalacion() {
       const instalada = estaEnStandalone();
-      const ios = esIOS();
-      const mostrarBoton = !instalada && (deferredInstallPrompt !== null || ios);
+      const mostrarBoton = !instalada && deferredInstallPrompt !== null;
 
       installAppBtn.hidden = !mostrarBoton;
-      installAppBtn.textContent = deferredInstallPrompt ? 'Instalar app' : 'Agregar a inicio';
+      installAppBtn.textContent = 'Instalar app';
+    }
+
+    function mostrarPopupInstalacionIOS() {
+      if (!esIOS() || estaEnStandalone()) {
+        return;
+      }
+
+      try {
+        if (window.localStorage.getItem(IOS_INSTALL_HINT_SEEN_KEY) === '1') {
+          return;
+        }
+      } catch (error) {
+        // Si localStorage falla, continuamos mostrando el popup.
+      }
+
+      const cerrar = () => {
+        iosInstallModal.classList.remove('is-open');
+        iosInstallModal.setAttribute('aria-hidden', 'true');
+        iosInstallCloseBtn.removeEventListener('click', onClose);
+        iosInstallModal.removeEventListener('click', onBackdrop);
+        document.removeEventListener('keydown', onKeyDown);
+        try {
+          window.localStorage.setItem(IOS_INSTALL_HINT_SEEN_KEY, '1');
+        } catch (error) {
+          // Ignorar errores de persistencia (modo privado/restricciones).
+        }
+      };
+
+      const onClose = () => cerrar();
+      const onBackdrop = (event) => {
+        if (event.target === iosInstallModal) {
+          cerrar();
+        }
+      };
+      const onKeyDown = (event) => {
+        if (event.key === 'Escape') {
+          cerrar();
+        }
+      };
+
+      iosInstallModal.classList.add('is-open');
+      iosInstallModal.setAttribute('aria-hidden', 'false');
+      iosInstallCloseBtn.focus();
+
+      iosInstallCloseBtn.addEventListener('click', onClose);
+      iosInstallModal.addEventListener('click', onBackdrop);
+      document.addEventListener('keydown', onKeyDown);
     }
 
     window.addEventListener('beforeinstallprompt', (event) => {
@@ -1365,19 +1443,6 @@
         await deferredInstallPrompt.userChoice;
         deferredInstallPrompt = null;
         actualizarUIInstalacion();
-        return;
-      }
-
-      if (esIOS() && navigator.share) {
-        try {
-          await navigator.share({
-            title: document.title,
-            text: 'Agrega Anthony Barber a tu pantalla de inicio.',
-            url: window.location.href
-          });
-        } catch (error) {
-          // Cancelar compartir es un flujo valido del usuario.
-        }
       }
     });
 
@@ -1391,6 +1456,7 @@
     }
 
     actualizarUIInstalacion();
+    mostrarPopupInstalacionIOS();
     iniciarAnimacionesScroll();
 
     function mostrarAvisoCita() {
