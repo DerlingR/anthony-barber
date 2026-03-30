@@ -21,6 +21,7 @@
       --mid: #5A5A50;
       --red: #8B1A1A;
       --safe-top: env(safe-area-inset-top, 0px);
+      --viewport-offset-top: 0px;
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -48,7 +49,9 @@
     /* ── NAV ── */
     nav {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: calc(var(--safe-top) + var(--viewport-offset-top));
+      left: 0;
+      right: 0;
       z-index: 100;
       display: flex;
       align-items: center;
@@ -833,11 +836,6 @@
       transform: translateY(-1px);
     }
 
-    .is-ios-standalone nav {
-      top: var(--safe-top);
-    }
-
-
     /* ── UBICACIÓN ── */
     .location {
       padding: 7rem 5rem;
@@ -1334,6 +1332,8 @@
     const iosInstallModal = document.getElementById('ios-install-modal');
     const iosInstallCloseBtn = document.getElementById('ios-install-close');
     const IOS_INSTALL_HINT_SEEN_KEY = 'ab_ios_install_hint_seen_v1';
+    const BOOKING_NAME_KEY = 'ab_booking_name_v1';
+    const BOOKING_SERVICE_KEY = 'ab_booking_service_v1';
     let deferredInstallPrompt = null;
 
     function iniciarAnimacionesScroll() {
@@ -1374,6 +1374,12 @@
 
     function estaEnStandalone() {
       return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function actualizarOffsetSuperiorNav() {
+      const viewport = window.visualViewport;
+      const offset = viewport ? Math.max(viewport.offsetTop || 0, 0) : 0;
+      document.documentElement.style.setProperty('--viewport-offset-top', `${offset}px`);
     }
 
     function actualizarUIInstalacion() {
@@ -1451,9 +1457,15 @@
       actualizarUIInstalacion();
     });
 
-    if (esIOS() && estaEnStandalone()) {
-      document.body.classList.add('is-ios-standalone');
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', actualizarOffsetSuperiorNav);
+      window.visualViewport.addEventListener('scroll', actualizarOffsetSuperiorNav);
     }
+
+    window.addEventListener('orientationchange', actualizarOffsetSuperiorNav);
+    window.addEventListener('resize', actualizarOffsetSuperiorNav);
+
+    actualizarOffsetSuperiorNav();
 
     actualizarUIInstalacion();
     mostrarPopupInstalacionIOS();
@@ -1507,10 +1519,12 @@
         return;
       }
 
-      const nombre   = document.getElementById('f-nombre').value.trim() || 'Sin nombre';
+      const nombreInputValue = document.getElementById('f-nombre').value.trim();
+      const servicioInputValue = document.getElementById('f-servicio').value;
+      const nombre   = nombreInputValue || 'Sin nombre';
       const fecha    = document.getElementById('f-fecha').value || 'Por definir';
       const hora     = document.getElementById('f-hora').value || 'Por definir';
-      const servicio = document.getElementById('f-servicio').value || 'Por definir';
+      const servicio = servicioInputValue || 'Por definir';
       const nota     = document.getElementById('f-nota').value.trim();
 
       let msg = `*Nueva Solicitud de Cita - Anthony Barber*\n\n`;
@@ -1521,13 +1535,22 @@
       if (nota) msg += `*Nota:* ${nota}\n`;
       msg += `\nConfirma mi cita, por favor.`;
 
+      try {
+        if (nombreInputValue) {
+          window.localStorage.setItem(BOOKING_NAME_KEY, nombreInputValue);
+        }
+        if (servicioInputValue) {
+          window.localStorage.setItem(BOOKING_SERVICE_KEY, servicioInputValue);
+        }
+      } catch (error) {
+        // Ignorar errores de almacenamiento y continuar con el envio.
+      }
+
       const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
 
-      document.getElementById('f-nombre').value = '';
       document.getElementById('f-fecha').value = '';
       document.getElementById('f-hora').value = '';
-      document.getElementById('f-servicio').value = '';
       document.getElementById('f-nota').value = '';
     }
 
@@ -1570,7 +1593,52 @@
       }
     }
 
+    function guardarPreferenciasCita() {
+      const nombreInput = document.getElementById('f-nombre');
+      const servicioSelect = document.getElementById('f-servicio');
+
+      try {
+        const nombre = nombreInput.value.trim();
+        const servicio = servicioSelect.value;
+
+        if (nombre) {
+          window.localStorage.setItem(BOOKING_NAME_KEY, nombre);
+        }
+
+        if (servicio) {
+          window.localStorage.setItem(BOOKING_SERVICE_KEY, servicio);
+        }
+      } catch (error) {
+        // Ignorar errores de almacenamiento del navegador.
+      }
+    }
+
+    function restaurarPreferenciasCita() {
+      const nombreInput = document.getElementById('f-nombre');
+      const servicioSelect = document.getElementById('f-servicio');
+
+      try {
+        const nombreGuardado = window.localStorage.getItem(BOOKING_NAME_KEY);
+        const servicioGuardado = window.localStorage.getItem(BOOKING_SERVICE_KEY);
+
+        if (nombreGuardado) {
+          nombreInput.value = nombreGuardado;
+        }
+
+        if (servicioGuardado) {
+          const existeOpcion = Array.from(servicioSelect.options).some((option) => option.value === servicioGuardado);
+          servicioSelect.value = existeOpcion ? servicioGuardado : '';
+        }
+      } catch (error) {
+        // Ignorar errores de lectura del almacenamiento.
+      }
+    }
+
     cargarHorasDisponibles();
+    restaurarPreferenciasCita();
+
+    document.getElementById('f-nombre').addEventListener('input', guardarPreferenciasCita);
+    document.getElementById('f-servicio').addEventListener('change', guardarPreferenciasCita);
 
     document.getElementById('map-link').setAttribute('href', MAPS_URL);
 
