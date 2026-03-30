@@ -1,8 +1,12 @@
-const CACHE_NAME = 'anthony-barber-pwa-v2';
+const CACHE_NAME = 'anthony-barber-pwa-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.webmanifest'
+  './manifest.webmanifest',
+  './icons/apple-touch-icon.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './img/local.png'
 ];
 
 self.addEventListener('install', (event) => {

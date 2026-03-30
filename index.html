@@ -706,46 +706,131 @@
       border-color: var(--gold-light);
     }
 
-    .ig-float {
+    .scroll-animate {
+      opacity: 0;
+      transform: translateY(26px) scale(.985);
+      transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1);
+      will-change: opacity, transform;
+    }
+
+    .scroll-animate.is-in-view {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .back-to-top {
       position: fixed;
       right: 1.1rem;
       bottom: 1.1rem;
-      z-index: 120;
+      z-index: 140;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(201,168,76,.45);
+      background: rgba(17,17,8,.88);
+      color: var(--gold-light);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: .45rem;
-      padding: .75rem 1rem;
-      background: linear-gradient(135deg, #f58529, #dd2a7b 45%, #8134af 75%, #515bd4);
-      color: #fff;
-      text-decoration: none;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity .25s ease, transform .25s ease, visibility .25s ease, border-color .25s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-to-top:hover {
+      border-color: var(--gold-light);
+      transform: translateY(8px);
+    }
+
+    .back-to-top.is-visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .back-to-top svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .reserve-float {
+      position: fixed;
+      right: 1.1rem;
+      bottom: 4.4rem;
+      z-index: 138;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 999px;
+      border: 1px solid rgba(201,168,76,.5);
+      background: linear-gradient(135deg, rgba(201,168,76,.95), rgba(226,201,126,.92));
+      color: #15130b;
+      text-decoration: none;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: .78rem;
-      letter-spacing: .14em;
       text-transform: uppercase;
+      letter-spacing: .11em;
+      font-size: .72rem;
       font-weight: 700;
-      box-shadow: 0 8px 22px rgba(0,0,0,.35);
+      padding: .66rem .95rem;
+      box-shadow: 0 10px 20px rgba(0,0,0,.3);
       transition: transform .2s ease, filter .2s ease;
     }
 
-    .ig-float:hover {
+    .reserve-float:hover {
       transform: translateY(-2px);
-      filter: brightness(1.05);
+      filter: brightness(1.03);
     }
 
-    .ig-float svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
+    .pwa-install {
+      position: fixed;
+      left: 1rem;
+      bottom: 1rem;
+      z-index: 135;
+      display: flex;
+      flex-direction: column;
+      gap: .45rem;
+      max-width: min(78vw, 320px);
     }
 
-    .ig-icon {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-      flex-shrink: 0;
+    .pwa-install-btn {
+      border: 1px solid rgba(201,168,76,.5);
+      background: rgba(17,17,8,.92);
+      color: var(--gold-light);
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: .75rem;
+      font-weight: 700;
+      padding: .62rem .8rem;
+      border-radius: 999px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: border-color .2s ease, transform .2s ease;
     }
+
+    .pwa-install-btn:hover {
+      border-color: var(--gold-light);
+      transform: translateY(-1px);
+    }
+
+    .pwa-install-hint {
+      margin: 0;
+      background: rgba(17,17,8,.92);
+      border: 1px solid rgba(201,168,76,.25);
+      color: rgba(245,240,232,.76);
+      font-size: .72rem;
+      line-height: 1.45;
+      padding: .58rem .75rem;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+    }
+
 
     /* ── UBICACIÓN ── */
     .location {
@@ -847,6 +932,22 @@
       color: rgba(245,240,232,.25);
     }
 
+    .footer-signature {
+      font-size: .8rem;
+      color: rgba(245,240,232,.35);
+    }
+
+    .footer-signature a {
+      color: var(--gold);
+      opacity: .75;
+      text-decoration: none;
+      transition: opacity .2s ease;
+    }
+
+    .footer-signature a:hover {
+      opacity: 1;
+    }
+
     .footer-bottom span {
       color: var(--gold);
       opacity: .6;
@@ -890,16 +991,26 @@
       .location { padding: 5rem 1.5rem; }
       .location-card { padding: 1.5rem; }
 
-      .ig-float {
-        right: .8rem;
-        bottom: .8rem;
-        padding: .7rem .9rem;
-        letter-spacing: .1em;
-      }
-
       .booking-modal-card { padding: 1.2rem; }
       .booking-modal-actions { width: 100%; }
       .modal-btn { width: 100%; }
+
+      .back-to-top {
+        right: .8rem;
+        bottom: .8rem;
+      }
+
+      .reserve-float {
+        right: .8rem;
+        bottom: 4rem;
+        font-size: .68rem;
+        padding: .6rem .85rem;
+      }
+
+      .pwa-install {
+        left: .8rem;
+        bottom: .8rem;
+      }
 
       footer { padding: 3rem 1.5rem 2rem; }
       .footer-top { grid-template-columns: 1fr; gap: 2rem; }
@@ -1061,9 +1172,7 @@
       </p>
       <ul class="booking-features">
         <li>Confirmación inmediata por WhatsApp</li>
-        <li>Elige tu barbero preferido</li>
         <li>Horarios flexibles de lunes a domingo</li>
-        <li>Sin cargos por cancelación con 2h de aviso</li>
       </ul>
       <div style="display:flex; gap:2rem; flex-wrap:wrap;">
         <div>
@@ -1085,7 +1194,7 @@
 
       <div class="form-group">
         <label>Tu nombre</label>
-        <input type="text" id="f-nombre" placeholder="Ej. Carlos Rodríguez" />
+        <input type="text" id="f-nombre" placeholder="" />
       </div>
 
       <div class="form-row">
@@ -1095,17 +1204,10 @@
         </div>
         <div class="form-group">
           <label>Hora preferida</label>
-          <input type="time" id="f-hora" />
+          <select id="f-hora">
+            <option value="">Seleccionar hora...</option>
+          </select>
         </div>
-      </div>
-
-      <div class="form-group">
-        <label>Horario (AM/PM)</label>
-        <select id="f-periodo">
-          <option value="">Seleccionar horario…</option>
-          <option value="AM">AM</option>
-          <option value="PM">PM</option>
-        </select>
       </div>
 
       <div class="form-group">
@@ -1172,23 +1274,22 @@
     </div>
     <div class="footer-bottom">
       <p>© 2025 Anthony Barber. Todos los derechos reservados.</p>
+      <p class="footer-signature">Desarrollado por <a href="https://github.com/DerlingR" target="_blank" rel="noopener noreferrer">Derling Rojas</a></p>
     </div>
   </footer>
 
-  <a
-    class="ig-float"
-    href="https://www.instagram.com/anthony_villegas_barber?igsh=MTNneDdycDE3MnV2Mw=="
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Abrir Instagram"
-  >
-    <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2m0-2A7.76 7.76 0 0 0 0 7.75v8.5A7.76 7.76 0 0 0 7.75 24h8.5A7.76 7.76 0 0 0 24 16.25v-8.5A7.76 7.76 0 0 0 16.25 0h-8.5z"/>
-      <path d="M12 6.84A5.16 5.16 0 1 1 6.84 12 5.16 5.16 0 0 1 12 6.84m0-2A7.16 7.16 0 1 0 19.16 12 7.16 7.16 0 0 0 12 4.84z"/>
-      <circle cx="18.2" cy="5.8" r="1.2"/>
+  <button type="button" class="back-to-top" id="back-to-top" aria-label="Volver arriba">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 6l-7 7 1.41 1.41L11 9.83V20h2V9.83l4.59 4.58L19 13z"/>
     </svg>
-    Instagram
-  </a>
+  </button>
+
+  <a href="#cita" class="reserve-float" aria-label="Ir a Reservar Cita">Reservar cita</a>
+
+  <div class="pwa-install" id="pwa-install">
+    <button type="button" class="pwa-install-btn" id="install-app-btn" hidden>Instalar app</button>
+    <p class="pwa-install-hint" id="ios-install-hint" hidden>En iPhone: toca Compartir y luego Agregar a pantalla de inicio.</p>
+  </div>
 
   <div class="booking-modal" id="booking-modal" aria-hidden="true">
     <div class="booking-modal-card" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title" aria-describedby="booking-modal-desc">
@@ -1207,6 +1308,78 @@
     const bookingModal = document.getElementById('booking-modal');
     const bookingContinueBtn = document.getElementById('booking-continue');
     const bookingCancelBtn = document.getElementById('booking-cancel');
+    const backToTopBtn = document.getElementById('back-to-top');
+    const installAppBtn = document.getElementById('install-app-btn');
+    const iosInstallHint = document.getElementById('ios-install-hint');
+    let deferredInstallPrompt = null;
+
+    function iniciarAnimacionesScroll() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+
+      const elementos = document.querySelectorAll(
+        '.section-header, .service-card, .gallery-item, .booking-left, .booking-card, .location-card, .footer-top, .footer-bottom'
+      );
+
+      if (!elementos.length) {
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in-view');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.18,
+        rootMargin: '0px 0px -8% 0px'
+      });
+
+      elementos.forEach((el, index) => {
+        el.classList.add('scroll-animate');
+        el.style.transitionDelay = `${Math.min((index % 6) * 70, 280)}ms`;
+        observer.observe(el);
+      });
+    }
+
+    function esIOS() {
+      return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    }
+
+    function estaEnStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function actualizarUIInstalacion() {
+      const instalada = estaEnStandalone();
+      installAppBtn.hidden = instalada || !deferredInstallPrompt;
+      iosInstallHint.hidden = instalada || deferredInstallPrompt !== null || !esIOS();
+    }
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      actualizarUIInstalacion();
+    });
+
+    installAppBtn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      actualizarUIInstalacion();
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      actualizarUIInstalacion();
+    });
+
+    actualizarUIInstalacion();
+    iniciarAnimacionesScroll();
 
     function mostrarAvisoCita() {
       return new Promise((resolve) => {
@@ -1259,15 +1432,13 @@
       const nombre   = document.getElementById('f-nombre').value.trim() || 'Sin nombre';
       const fecha    = document.getElementById('f-fecha').value || 'Por definir';
       const hora     = document.getElementById('f-hora').value || 'Por definir';
-      const periodo  = document.getElementById('f-periodo').value;
       const servicio = document.getElementById('f-servicio').value || 'Por definir';
       const nota     = document.getElementById('f-nota').value.trim();
-      const horaCompleta = hora === 'Por definir' ? hora : `${hora} ${periodo}`.trim();
 
       let msg = `*Nueva Solicitud de Cita - Anthony Barber*\n\n`;
       msg += `*Nombre:* ${nombre}\n`;
       msg += `*Fecha:* ${fecha}\n`;
-      msg += `*Hora:* ${horaCompleta}\n`;
+      msg += `*Hora:* ${hora}\n`;
       msg += `*Servicio:* ${servicio}\n`;
       if (nota) msg += `*Nota:* ${nota}\n`;
       msg += `\nConfirma mi cita, por favor.`;
@@ -1278,31 +1449,50 @@
       document.getElementById('f-nombre').value = '';
       document.getElementById('f-fecha').value = '';
       document.getElementById('f-hora').value = '';
-      document.getElementById('f-periodo').value = '';
       document.getElementById('f-servicio').value = '';
       document.getElementById('f-nota').value = '';
     }
 
-    // ── ANIMACIÓN DE ENTRADA AL SCROLL ──
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, { threshold: 0.1 });
+    function actualizarBotonSubir() {
+      const scrolledToBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 120;
+      backToTopBtn.classList.toggle('is-visible', scrolledToBottom);
+    }
 
-    document.querySelectorAll('.service-card, .gallery-item, .booking-card').forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(20px)';
-      el.style.transition = 'opacity .6s ease, transform .6s ease';
-      observer.observe(el);
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    window.addEventListener('scroll', actualizarBotonSubir, { passive: true });
+    window.addEventListener('resize', actualizarBotonSubir);
+    actualizarBotonSubir();
 
     // ── FECHA MÍNIMA HOY ──
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('f-fecha').setAttribute('min', today);
+
+    function pad2(value) {
+      return String(value).padStart(2, '0');
+    }
+
+    function format12Hour(hours, minutes) {
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+      return `${hour12}:${pad2(minutes)} ${period}`;
+    }
+
+    function cargarHorasDisponibles() {
+      const horaSelect = document.getElementById('f-hora');
+      for (let h = 1; h < 24; h += 1) {
+        for (let m = 0; m < 60; m += 30) {
+          const option = document.createElement('option');
+          option.value = format12Hour(h, m);
+          option.textContent = format12Hour(h, m);
+          horaSelect.appendChild(option);
+        }
+      }
+    }
+
+    cargarHorasDisponibles();
 
     document.getElementById('map-link').setAttribute('href', MAPS_URL);
 
