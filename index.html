@@ -20,6 +20,7 @@
       --charcoal: #2A2A25;
       --mid: #5A5A50;
       --red: #8B1A1A;
+      --safe-top: env(safe-area-inset-top, 0px);
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -56,6 +57,9 @@
       background: rgba(17,17,8,.85);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(201,168,76,.15);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translate3d(0, 0, 0);
     }
 
     .nav-logo {
@@ -792,9 +796,6 @@
       left: 1rem;
       bottom: 1rem;
       z-index: 135;
-      display: flex;
-      flex-direction: column;
-      gap: .45rem;
       max-width: min(78vw, 320px);
     }
 
@@ -819,16 +820,8 @@
       transform: translateY(-1px);
     }
 
-    .pwa-install-hint {
-      margin: 0;
-      background: rgba(17,17,8,.92);
-      border: 1px solid rgba(201,168,76,.25);
-      color: rgba(245,240,232,.76);
-      font-size: .72rem;
-      line-height: 1.45;
-      padding: .58rem .75rem;
-      border-radius: 10px;
-      backdrop-filter: blur(10px);
+    .is-ios-standalone nav {
+      top: var(--safe-top);
     }
 
 
@@ -1288,7 +1281,6 @@
 
   <div class="pwa-install" id="pwa-install">
     <button type="button" class="pwa-install-btn" id="install-app-btn" hidden>Instalar app</button>
-    <p class="pwa-install-hint" id="ios-install-hint" hidden>En iPhone: toca Compartir y luego Agregar a pantalla de inicio.</p>
   </div>
 
   <div class="booking-modal" id="booking-modal" aria-hidden="true">
@@ -1310,7 +1302,6 @@
     const bookingCancelBtn = document.getElementById('booking-cancel');
     const backToTopBtn = document.getElementById('back-to-top');
     const installAppBtn = document.getElementById('install-app-btn');
-    const iosInstallHint = document.getElementById('ios-install-hint');
     let deferredInstallPrompt = null;
 
     function iniciarAnimacionesScroll() {
@@ -1355,8 +1346,11 @@
 
     function actualizarUIInstalacion() {
       const instalada = estaEnStandalone();
-      installAppBtn.hidden = instalada || !deferredInstallPrompt;
-      iosInstallHint.hidden = instalada || deferredInstallPrompt !== null || !esIOS();
+      const ios = esIOS();
+      const mostrarBoton = !instalada && (deferredInstallPrompt !== null || ios);
+
+      installAppBtn.hidden = !mostrarBoton;
+      installAppBtn.textContent = deferredInstallPrompt ? 'Instalar app' : 'Agregar a inicio';
     }
 
     window.addEventListener('beforeinstallprompt', (event) => {
@@ -1366,17 +1360,35 @@
     });
 
     installAppBtn.addEventListener('click', async () => {
-      if (!deferredInstallPrompt) return;
-      deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      actualizarUIInstalacion();
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        actualizarUIInstalacion();
+        return;
+      }
+
+      if (esIOS() && navigator.share) {
+        try {
+          await navigator.share({
+            title: document.title,
+            text: 'Agrega Anthony Barber a tu pantalla de inicio.',
+            url: window.location.href
+          });
+        } catch (error) {
+          // Cancelar compartir es un flujo valido del usuario.
+        }
+      }
     });
 
     window.addEventListener('appinstalled', () => {
       deferredInstallPrompt = null;
       actualizarUIInstalacion();
     });
+
+    if (esIOS() && estaEnStandalone()) {
+      document.body.classList.add('is-ios-standalone');
+    }
 
     actualizarUIInstalacion();
     iniciarAnimacionesScroll();
